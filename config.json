@@ -1,0 +1,4 @@
+{
+  "hero": "[username]",
+  "dir": "[logs directory]"      // Needs to end in '/*' for the glob to work
+}
