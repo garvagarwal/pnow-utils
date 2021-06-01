@@ -64,13 +64,16 @@ if __name__ == "__main__":
 	if len(sys.argv) == 2:
 		mult = sys.argv[1]
 
-	# Finds latest log
-	list_of_files = glob.glob(info['dir'])
-	list_of_files = list(filter(lambda x : '.csv' in x, list_of_files))
-	latest_file = max(list_of_files, key=os.path.getctime)
+	# Runs on all logs that don't have 
+	list_of_files = glob.glob(info['csv_dir'])
 
-	# Saves file as same name but with .txt
-	in_fn = latest_file
-	out_fn = in_fn[:-3] + 'txt'
+	for file in list_of_files:
+		# Saves file as same name but with .txt
+		in_fn = file
+		paths = in_fn.split('/')
+		out_fn = info['txt_dir'] + paths[-1][:-3] + 'txt'
 
-	main(in_fn, out_fn, hero, mult)
+		if not os.path.exists(out_fn):
+			print(out_fn)
+
+		# main(in_fn, out_fn, hero, mult)
