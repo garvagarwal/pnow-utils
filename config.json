@@ -1,4 +1,5 @@
 {
   "hero": "[username]",
-  "dir": "[logs directory]"
+  "csv_dir": "[logs input directory]",
+  "txt_dir": "[logs output directory]"
 }
