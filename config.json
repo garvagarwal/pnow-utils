@@ -1,0 +1,5 @@
+{
+  "hero": "[username]",
+  "csv_dir": "[logs input directory]",
+  "txt_dir": "[logs output directory]"
+}
