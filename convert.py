@@ -3,17 +3,18 @@
 import requests
 from lxml import html
 import sys
-import re
 import glob
 import os
 import json
-from tqdm import trange
+import time
+import datetime
+
 
 def main(in_fn, out_fn, hero, mult):
 	file_input = read_file(in_fn)
 	output = pn2ps(file_input, hero, mult)
+	game_info(output)
 	save_output(out_fn, output)
-	print(f'Hands played: {count_hands(output)}')
 
 
 def read_file(in_fn): 
@@ -27,6 +28,7 @@ def read_file(in_fn):
 	return data
 
 
+# Converts log to Poker Stars format using web request
 def pn2ps(raw, hero, mult):
 	url = 'https://pokernowconvert.herokuapp.com/logs'
 	data = {'heroname' : hero,
@@ -40,12 +42,34 @@ def pn2ps(raw, hero, mult):
 	return output.text
 
 
-def count_hands(text):
-	hands = text.split('\n\n')
+def game_info(output):
+	hands = output.split('\n\n')
+	first_hand = hands[0]
+	lines = first_hand.split('\n')
+	print(lines[0].split(': ')[1][:-12], '\n')
 
-	hands_played = len([hand for hand in hands if 'Dealt to' in hand])
+	start, end = None, None
+	for i, hand in enumerate(hands):
+		if '#' not in hand:
+			continue
 
-	return hands_played
+		lines = hand.split('\n')
+		time_struct  = time.strptime(lines[0].split('- ')[1][:-3], "%Y/%m/%d %H:%M:%S")
+		
+		if 'Dealt to' in hand and start == None:
+			start = time_struct
+		
+		if i != 0 and 'Dealt to' in hands[i - 1]:
+			end = time_struct
+
+	t1, t2 = time.mktime(start), time.mktime(end)
+	print(f"Played from {time.strftime('%H:%M', start)} to {time.strftime('%H:%M', end)} ({datetime.timedelta(seconds=t2-t1)})")
+
+	print(f'Hands played: {count_hands(hands)}')
+
+
+def count_hands(hands):
+	return len([hand for hand in hands if 'Dealt to' in hand])
 
 
 def save_output(out_fn, output):
@@ -74,6 +98,7 @@ if __name__ == "__main__":
 		out_fn = info['txt_dir'] + paths[-1][:-3] + 'txt'
 
 		if not os.path.exists(out_fn):
-			print(out_fn)
-
-		# main(in_fn, out_fn, hero, mult)
+			print('-'*80)
+			print(in_fn)
+			main(in_fn, out_fn, hero, mult)
+			print()
