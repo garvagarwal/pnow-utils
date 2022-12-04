@@ -7,7 +7,7 @@ import glob
 import os
 import json
 import time
-import datetime
+from datetime import datetime, timedelta
 
 
 def main(in_fn, out_fn, hero, mult):
@@ -54,7 +54,7 @@ def game_info(output):
 			continue
 
 		lines = hand.split('\n')
-		time_struct  = time.strptime(lines[0].split('- ')[1][:-3], "%Y/%m/%d %H:%M:%S")
+		time_struct = datetime.strptime(lines[0].split('- ')[1][:-3], "%Y/%m/%d %H:%M:%S")
 		
 		if 'Dealt to' in hand and start == None:
 			start = time_struct
@@ -62,8 +62,7 @@ def game_info(output):
 		if i != 0 and 'Dealt to' in hands[i - 1]:
 			end = time_struct
 
-	t1, t2 = time.mktime(start), time.mktime(end)
-	print(f"Played from {time.strftime('%H:%M', start)} to {time.strftime('%H:%M', end)} ({datetime.timedelta(seconds=t2-t1)})")
+	print(f"Played from {start.strftime('%H:%M')} to {end.strftime('%H:%M')} ({end-start})")
 
 	print(f'Hands played: {count_hands(hands)}')
 
